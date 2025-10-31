@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Career Pathfinder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Prism.js CSS (Okaidia Theme) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --background: #ffffff; /* white */
+            --foreground: #0f172a; /* slate-900 */
+            --card-background: #f1f5f9; /* slate-100 */
+            --card-foreground: #334155; /* slate-700 */
+            --muted-foreground: #64748b; /* slate-500 */
+            --card-border: #e2e8f0; /* slate-200 */
+            --primary: #0891b2; /* cyan-600 */
+            --primary-hover: #0e7490; /* cyan-700 */
+            --button-secondary-background: #e2e8f0;
+            --button-secondary-hover: #cbd5e1;
+            --gradient-from: #0ea5e9; /* sky-500 */
+            --gradient-to: #2563eb; /* blue-600 */
+        }
+
+        html.dark {
+            --background: #0f172a; /* slate-900 */
+            --foreground: #f1f5f9; /* slate-100 */
+            --card-background: #1e293b; /* slate-800 */
+            --card-foreground: #e2e8f0; /* slate-200 */
+            --muted-foreground: #94a3b8; /* slate-400 */
+            --card-border: #334155; /* slate-700 */
+            --primary: #22d3ee; /* cyan-400 */
+            --primary-hover: #06b6d4; /* cyan-500 */
+            --button-secondary-background: #475569;
+            --button-secondary-hover: #64748b;
+            --gradient-from: #22d3ee; /* cyan-400 */
+            --gradient-to: #3b82f6; /* blue-500 */
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Background Animation */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+            animation: blob 10s infinite ease-in-out;
+        }
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
+
+
+        /* Prism Light Theme Overrides */
+        html:not(.dark) pre[class*="language-"] {
+            border: 1px solid var(--card-border);
+            background: var(--card-background) !important;
+            color: #383a42; /* One Light syntax text */
+            text-shadow: 0 1px white;
+        }
+        html:not(.dark) .token.comment,
+        html:not(.dark) .token.prolog,
+        html:not(.dark) .token.doctype,
+        html:not(.dark) .token.cdata {
+            color: #a0a1a7; /* One Light comment */
+        }
+        html:not(.dark) .token.punctuation {
+            color: #383a42;
+        }
+        html:not(.dark) .token.property,
+        html:not(.dark) .token.tag,
+        html:not(.dark) .token.boolean,
+        html:not(.dark) .token.number,
+        html:not(.dark) .token.constant,
+        html:not(.dark) .token.symbol,
+        html:not(.dark) .token.deleted {
+            color: #d19a66; /* One Light orange */
+        }
+        html:not(.dark) .token.selector,
+        html:not(.dark) .token.attr-name,
+        html:not(.dark) .token.string,
+        html:not(.dark) .token.char,
+        html:not(.dark) .token.builtin,
+        html:not(.dark) .token.inserted {
+            color: #50a14f; /* One Light green */
+        }
+        html:not(.dark) .token.operator,
+        html:not(.dark) .token.entity,
+        html:not(.dark) .token.url,
+        html:not(.dark) .language-css .token.string,
+        html:not(.dark) .style .token.string {
+            color: #0184bc; /* One Light blue */
+            background: hsla(0, 0%, 100%, .5);
+        }
+        html:not(.dark) .token.atrule,
+        html:not(.dark) .token.attr-value,
+        html:not(.dark) .token.keyword {
+            color: #a626a4; /* One Light purple */
+        }
+        html:not(.dark) .token.function,
+        html:not(.dark) .token.class-name {
+            color: #c18401; /* One Light yellow */
+        }
+        html:not(.dark) .token.regex,
+        html:not(.dark) .token.important,
+        html:not(.dark) .token.variable {
+            color: #e45649; /* One Light red */
+        }
+        html:not(.dark) .line-numbers .line-numbers-rows {
+             border-right: 1px solid var(--card-border) !important;
+             background: var(--card-background) !important;
+        }
+        html:not(.dark) .line-numbers-rows > span:before {
+            color: var(--muted-foreground);
+        }
+
+        /* Prism Dark Theme Customizations */
+        html.dark pre[class*="language-"] {
+            border: 1px solid var(--card-border);
+            background: var(--card-background) !important;
+        }
+        html.dark .line-numbers .line-numbers-rows {
+            border-right: 1px solid var(--card-border) !important;
+            background: var(--card-background) !important;
+        }
+        html.dark :not(pre) > code[class*="language-"], 
+        html.dark pre[class*="language-"] {
+            background: var(--card-background) !important;
+        }
+        html.dark code[class*="language-"] {
+            color: #e2e8f0; /* text-slate-200 */
+        }
+
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.0",
+    "vite": "https://aistudiocdn.com/vite@^7.1.12"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./index.tsx"></script>
+
+    <!-- Prism.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+  </body>
+</html>
