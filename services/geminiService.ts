@@ -4,10 +4,12 @@ import { Roadmap } from '../types';
 // allow using process.env in browser build without @types/node
 declare const process: any;
 
-const API_KEY = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : undefined;
+// Read API key securely from environment variable
+const API_KEY=import.meta.env.VITE_GEMINI_API_KEY;
+
 
 if (!API_KEY) {
-  throw new Error("API_KEY environment variable not found.");
+  throw new Error("REACT_APP_GEMINI_API_KEY environment variable not found.");
 }
 
 const ai = new GoogleGenAI({ apiKey: API_KEY });
@@ -60,20 +62,21 @@ const roadmapSchema = {
   required: ['careerPath', 'introduction', 'phases', 'conclusion', 'courses'],
 };
 
+
 export const generateRoadmap = async (careerPath: string): Promise<Roadmap> => {
   const prompt = `
     Generate a detailed, step-by-step career roadmap for an aspiring ${careerPath}.
     The roadmap should be structured into logical phases, starting from absolute fundamentals and progressing to advanced, job-ready skills.
-    
+
     For each phase, provide:
     - A clear title.
     - A brief description of its goal.
     - A list of key skills, technologies, or concepts to learn.
-    
+
     For each skill, provide:
     - A concise description explaining its importance in the context of the career path.
     - Where appropriate, include a small, simple code snippet using Markdown format (e.g., \`\`\`javascript\nconsole.log('Hello');\n\`\`\`) to illustrate the concept.
-    
+
     Additionally, generate a list of 8 recommended online courses relevant to this roadmap. For each course, provide:
     1. The course name.
     2. The platform (e.g., freeCodeCamp, Coursera, Udemy).
@@ -99,10 +102,10 @@ export const generateRoadmap = async (careerPath: string): Promise<Roadmap> => {
 
   const jsonText = (response.text?.trim()) ?? '';
   try {
-     const roadmapData = JSON.parse(jsonText);
-     return roadmapData;
+    const roadmapData = JSON.parse(jsonText);
+    return roadmapData;
   } catch(e) {
-      console.error("Failed to parse JSON response:", jsonText);
-      throw new Error("The AI returned an invalid response format.");
+    console.error("Failed to parse JSON response:", jsonText);
+    throw new Error("The AI returned an invalid response format.");
   }
 };

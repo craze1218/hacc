@@ -1,4 +1,11 @@
-import React, { useState, useCallback, createContext, useContext, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  useCallback,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+} from 'react';
 import { Roadmap } from './types';
 import { generateRoadmap } from './services/geminiService';
 import RoleSelector from './components/RoleSelector';
@@ -35,11 +42,10 @@ const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
-    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   }, []);
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
-
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
 
@@ -66,19 +72,18 @@ const ThemeSwitcher: React.FC = () => {
 };
 
 const BackgroundAnimation: React.FC = () => (
-    <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 filter blur-3xl">
-        <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2">
-             <div className="w-[40vmax] h-[40vmax] rounded-full bg-[var(--primary)] opacity-20 animate-blob"></div>
-        </div>
-        <div className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4">
-            <div className="w-[30vmax] h-[30vmax] rounded-full bg-[var(--gradient-to)] opacity-20 animate-blob animation-delay-2000"></div>
-        </div>
-        <div className="absolute bottom-1/2 right-1/2">
-            <div className="w-[20vmax] h-[20vmax] rounded-full bg-[var(--gradient-from)] opacity-20 animate-blob animation-delay-4000"></div>
-        </div>
+  <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 filter blur-3xl">
+    <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2">
+      <div className="w-[40vmax] h-[40vmax] rounded-full bg-[var(--primary)] opacity-20 animate-blob"></div>
     </div>
+    <div className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4">
+      <div className="w-[30vmax] h-[30vmax] rounded-full bg-[var(--gradient-to)] opacity-20 animate-blob animation-delay-2000"></div>
+    </div>
+    <div className="absolute bottom-1/2 right-1/2">
+      <div className="w-[20vmax] h-[20vmax] rounded-full bg-[var(--gradient-from)] opacity-20 animate-blob animation-delay-4000"></div>
+    </div>
+  </div>
 );
-
 
 const AppContent: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -86,23 +91,44 @@ const AppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // -- Handle browser back navigation --
+  useEffect(() => {
+    const onPopState = () => {
+      setSelectedRole(null);
+      setRoadmap(null);
+      setError(null);
+      setIsLoading(false);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
   const handleSelectRole = useCallback(async (role: string) => {
+    window.history.pushState({ role }, '', '#roadmap');
     setSelectedRole(role);
     setIsLoading(true);
     setError(null);
     setRoadmap(null);
+
+    const startTime = performance.now(); // Start timing
+
     try {
       const result = await generateRoadmap(role);
+      const endTime = performance.now(); // End timing
+      console.log(`Gemini API call for "${role}" took ${(endTime - startTime).toFixed(2)} ms`);
       setRoadmap(result);
     } catch (err) {
       console.error(err);
-      setError('Failed to generate roadmap. The AI might be busy, or an API key error occurred. Please try again later.');
+      setError(
+        'Failed to generate roadmap. The AI might be busy, or an API key error occurred. Please try again later.'
+      );
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const handleReset = () => {
+    window.history.pushState({}, '', '#home');
     setSelectedRole(null);
     setRoadmap(null);
     setError(null);
@@ -114,7 +140,7 @@ const AppContent: React.FC = () => {
       <BackgroundAnimation />
       <div className="max-w-7xl mx-auto relative z-10">
         <header className="flex justify-between items-center mb-8">
-           <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--gradient-from)] to-[var(--gradient-to)]">
+          <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--gradient-from)] to-[var(--gradient-to)]">
             Smart Career Pathfinder
           </h1>
           <div className="flex items-center gap-4">
@@ -124,11 +150,22 @@ const AppContent: React.FC = () => {
 
         <main>
           {isLoading && <LoadingSpinner />}
-          {error && !isLoading && <ErrorDisplay message={error} onRetry={() => handleSelectRole(selectedRole!)} onReset={handleReset} />}
-          {!selectedRole && !isLoading && !error && <RoleSelector onSelectRole={handleSelectRole} onBack={function (): void {
-            throw new Error('Function not implemented.');
-          } } />}
-          {roadmap && !isLoading && !error && <RoadmapDisplay roadmap={roadmap} onBack={handleReset} />}
+
+          {error && !isLoading && selectedRole && (
+            <ErrorDisplay
+              message={error}
+              onRetry={() => handleSelectRole(selectedRole)}
+              onReset={handleReset}
+            />
+          )}
+
+          {!selectedRole && !isLoading && !error && (
+            <RoleSelector onSelectRole={handleSelectRole} onBack={handleReset} />
+          )}
+
+          {roadmap && !isLoading && !error && (
+            <RoadmapDisplay roadmap={roadmap} onBack={handleReset} />
+          )}
         </main>
       </div>
     </div>
