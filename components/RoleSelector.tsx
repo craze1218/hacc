@@ -224,6 +224,118 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ onSelectRole, onBack, roadm
           })}
         </div>
       )}
+
+      {!roadmap && (
+        <div className="mt-12 max-w-4xl mx-auto">
+          <div className="bg-[var(--card-background)] border border-[var(--card-border)] rounded-xl p-8 shadow-lg">
+            <h2 className="text-2xl font-bold text-[var(--foreground)] mb-6 text-center">About Smart Career Pathfinder</h2>
+            
+            <div className="space-y-6 text-[var(--card-foreground)]">
+              <div>
+                <h3 className="text-xl font-semibold text-[var(--primary)] mb-3">What is Smart Career Pathfinder?</h3>
+                <p className="leading-relaxed">
+                  Smart Career Pathfinder is an AI-powered platform that helps you discover and navigate your ideal career path in technology. 
+                  Whether you're just starting out or looking to transition into a new tech role, our intelligent system generates personalized 
+                  learning roadmaps tailored to your chosen career direction. Using advanced AI technology, we create comprehensive guides that 
+                  break down complex career paths into manageable phases, complete with essential skills, recommended courses, and actionable steps.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold text-[var(--primary)] mb-3">How to Use This Website</h3>
+                <ol className="list-decimal list-inside space-y-3 leading-relaxed">
+                  <li>
+                    <strong className="text-[var(--foreground)]">Choose Your Career Path:</strong> Browse through the available career roles 
+                    (Frontend Developer, Backend Developer, Full Stack Developer, Data Scientist, or AI Engineer) and click on the one that 
+                    interests you most.
+                  </li>
+                  <li>
+                    <strong className="text-[var(--foreground)]">Wait for AI Generation:</strong> Our AI system will analyze your selected 
+                    career path and generate a comprehensive roadmap. This process typically takes a few seconds to a minute. Please be patient 
+                    while the roadmap is being created.
+                  </li>
+                  <li>
+                    <strong className="text-[var(--foreground)]">Explore Your Roadmap:</strong> Once generated, you'll see a detailed roadmap 
+                    organized into phases. Each phase includes:
+                    <ul className="list-disc list-inside ml-6 mt-2 space-y-1">
+                      <li>Essential skills you need to learn</li>
+                      <li>Detailed descriptions of each skill</li>
+                      <li>Recommended courses from various learning platforms</li>
+                      <li>Links to external resources</li>
+                    </ul>
+                  </li>
+                  <li>
+                    <strong className="text-[var(--foreground)]">Save Your Roadmap:</strong> If you're logged in, you can save your generated 
+                    roadmaps for future reference. Access them anytime from the "My Roadmaps" section in the header.
+                  </li>
+                  <li>
+                    <strong className="text-[var(--foreground)]">Track Your Progress:</strong> Use the roadmap as a guide to track your learning 
+                    journey. Click on course links to explore external resources, and work through each phase systematically.
+                  </li>
+                  <li>
+                    <strong className="text-[var(--foreground)]">Ask Technical Questions:</strong> Need help with programming concepts or career advice? 
+                    Click the chatbot button (message icon) in the bottom-right corner to get instant answers to your technical questions. Our AI assistant 
+                    can help with coding problems, explain complex topics, provide learning resources, and offer career guidance.
+                  </li>
+                </ol>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold text-[var(--primary)] mb-3">Technical Assistant Chatbot</h3>
+                <p className="leading-relaxed mb-3">
+                  Our intelligent chatbot is your personal technical assistant available 24/7. Accessible via the floating message button in the bottom-right 
+                  corner, it's designed to help you with a wide range of technical questions and learning needs.
+                </p>
+                <ul className="list-disc list-inside space-y-2 leading-relaxed">
+                  <li>
+                    <strong className="text-[var(--foreground)]">Programming Help:</strong> Get explanations for programming concepts, syntax, and best practices 
+                    in languages like JavaScript, Python, React, and more
+                  </li>
+                  <li>
+                    <strong className="text-[var(--foreground)]">Career Guidance:</strong> Receive advice on tech career paths, interview preparation, and skill development
+                  </li>
+                  <li>
+                    <strong className="text-[var(--foreground)]">Learning Resources:</strong> Ask for recommendations on courses, tutorials, and learning materials
+                  </li>
+                  <li>
+                    <strong className="text-[var(--foreground)]">Code Examples:</strong> Request code snippets and examples to better understand concepts
+                  </li>
+                  <li>
+                    <strong className="text-[var(--foreground)]">Problem Solving:</strong> Get help debugging code, troubleshooting issues, and finding solutions
+                  </li>
+                  <li>
+                    <strong className="text-[var(--foreground)]">Contextual Conversations:</strong> The chatbot remembers your conversation history, providing 
+                    personalized and context-aware responses
+                  </li>
+                </ul>
+                <p className="leading-relaxed mt-3 text-sm text-[var(--muted-foreground)]">
+                  Simply click the chatbot icon, type your question, and receive detailed, helpful responses. You can minimize, close, or clear the chat 
+                  conversation at any time. The chatbot supports markdown formatting for code blocks and provides clear, beginner-friendly explanations.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-xl font-semibold text-[var(--primary)] mb-3">Key Features</h3>
+                <ul className="list-disc list-inside space-y-2 leading-relaxed">
+                  <li><strong className="text-[var(--foreground)]">AI-Powered Generation:</strong> Each roadmap is uniquely generated using advanced AI technology</li>
+                  <li><strong className="text-[var(--foreground)]">Structured Learning Paths:</strong> Clear phases that break down complex career goals into achievable steps</li>
+                  <li><strong className="text-[var(--foreground)]">Comprehensive Resources:</strong> Curated list of courses and learning materials from trusted platforms</li>
+                  <li><strong className="text-[var(--foreground)]">AI Technical Assistant:</strong> 24/7 chatbot support for instant answers to programming questions and career guidance</li>
+                  <li><strong className="text-[var(--foreground)]">Save & Access Anytime:</strong> Save multiple roadmaps and revisit them whenever you need guidance</li>
+                  <li><strong className="text-[var(--foreground)]">User-Friendly Interface:</strong> Clean, modern design with dark/light theme support for comfortable browsing</li>
+                </ul>
+              </div>
+
+              <div className="pt-4 border-t border-[var(--card-border)]">
+                <p className="text-sm text-[var(--muted-foreground)] italic">
+                  <strong className="text-[var(--foreground)]">Note:</strong> Roadmap generation may take up to a minute during peak usage times. 
+                  If you encounter any issues, please try again later or refresh the page.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

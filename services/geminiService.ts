@@ -113,3 +113,52 @@ export const generateRoadmap = async (careerPath: string): Promise<Roadmap> => {
     throw new Error("The AI returned an invalid response format.");
   }
 };
+
+// Chat message interface
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+// Generate chat response for technical questions
+export const generateChatResponse = async (
+  message: string,
+  conversationHistory: ChatMessage[] = []
+): Promise<string> => {
+  const systemInstruction = `You are a helpful technical assistant for the Smart Career Pathfinder platform. 
+    Your role is to answer technical questions related to:
+    - Programming languages (JavaScript, Python, React, etc.)
+    - Web development (frontend, backend, full-stack)
+    - Data science and AI/ML concepts
+    - Career guidance in tech
+    - Learning resources and best practices
+    
+    Provide clear, concise, and accurate answers. When appropriate, include code examples using markdown code blocks.
+    Be encouraging and supportive, especially for beginners. If you don't know something, admit it rather than guessing.`;
+
+  // Build conversation context
+  const conversationContext = conversationHistory
+    .map((msg) => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
+    .join('\n');
+
+  const prompt = conversationHistory.length > 0
+    ? `${conversationContext}\n\nUser: ${message}\nAssistant:`
+    : `User: ${message}\nAssistant:`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        systemInstruction,
+        temperature: 0.7,
+        maxOutputTokens: 2048,
+      },
+    });
+
+    return response.text?.trim() || 'Sorry, I could not generate a response. Please try again.';
+  } catch (error) {
+    console.error('Chat error:', error);
+    throw new Error('Failed to get response from the AI. Please try again later.');
+  }
+};

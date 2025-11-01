@@ -18,6 +18,7 @@ import Signup from './components/Signup';
 import { SunIcon, MoonIcon, RocketIcon, UserIcon, LogOutIcon, BookmarkIcon } from './components/icons';
 import PixelBlast from './components/PixelBlast';
 import SavedRoadmaps from './components/SavedRoadmaps';
+import Chatbot from './components/Chatbot';
 import { useAuth } from './contexts/AuthContext';
 
 // --- Theme Management ---
@@ -320,6 +321,7 @@ const App: React.FC = () => (
         }
       />
     </Routes>
+    <Chatbot />
   </ThemeProvider>
 );
 
