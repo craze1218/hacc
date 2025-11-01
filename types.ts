@@ -16,6 +16,7 @@ export interface Course {
   description: string;
   icon: string;
   link: string;
+  isFree: boolean;
 }
 
 export interface Roadmap {
@@ -24,4 +25,12 @@ export interface Roadmap {
   phases: Phase[];
   conclusion: string;
   courses: Course[];
+}
+
+export interface SavedRoadmap {
+  id: string;
+  userId: string;
+  roadmap: Roadmap;
+  savedAt: string;
+  lastViewed?: string;
 }

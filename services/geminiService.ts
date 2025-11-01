@@ -52,9 +52,10 @@ const roadmapSchema = {
           platform: { type: Type.STRING, description: "The platform offering the course (e.g., Coursera, Udemy, freeCodeCamp)." },
           description: { type: Type.STRING, description: "A brief description of what the course covers." },
           icon: { type: Type.STRING, description: "An icon name that best represents the course. Choose from: HTML, CSS, JavaScript, React, Python, Database, Backend, Career." },
-          link: { type: Type.STRING, description: "A valid, direct URL to the course page." }
+          link: { type: Type.STRING, description: "A valid, direct URL to the course page." },
+          isFree: { type: Type.BOOLEAN, description: "Whether the course is free (true) or paid (false)." }
         },
-        required: ['name', 'platform', 'description', 'icon', 'link']
+        required: ['name', 'platform', 'description', 'icon', 'link', 'isFree']
       }
     },
     conclusion: { type: Type.STRING },
@@ -77,12 +78,15 @@ export const generateRoadmap = async (careerPath: string): Promise<Roadmap> => {
     - A concise description explaining its importance in the context of the career path.
     - Where appropriate, include a small, simple code snippet using Markdown format (e.g., \`\`\`javascript\nconsole.log('Hello');\n\`\`\`) to illustrate the concept.
 
-    Additionally, generate a list of 8 recommended online courses relevant to this roadmap. For each course, provide:
+    Additionally, generate a list of 8-10 recommended online courses relevant to this roadmap. Include a mix of FREE and PAID courses. For each course, provide:
     1. The course name.
-    2. The platform (e.g., freeCodeCamp, Coursera, Udemy).
+    2. The platform (e.g., freeCodeCamp, Coursera, Udemy, YouTube, Khan Academy).
     3. A brief description of what the course covers.
     4. A relevant icon name from the following list: 'HTML', 'CSS', 'JavaScript', 'React', 'Python', 'Database', 'Backend', 'Career'.
     5. A valid, direct URL to access the course.
+    6. isFree: true for free courses, false for paid courses.
+
+    Please include at least 4-5 FREE courses (from platforms like freeCodeCamp, YouTube, Khan Academy, etc.) and 3-5 PAID courses (from Udemy, Coursera, etc.).
 
     Ensure the output is comprehensive and practical for a beginner.
   `;

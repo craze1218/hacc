@@ -6,13 +6,19 @@ import React, {
   useEffect,
   useMemo,
 } from 'react';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { Roadmap } from './types';
 import { generateRoadmap } from './services/geminiService';
 import RoleSelector from './components/RoleSelector';
 import RoadmapDisplay from './components/RoadmapDisplay';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorDisplay from './components/ErrorDisplay';
-import { SunIcon, MoonIcon } from './components/icons';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import { SunIcon, MoonIcon, RocketIcon, UserIcon, LogOutIcon, BookmarkIcon } from './components/icons';
+import PixelBlast from './components/PixelBlast';
+import SavedRoadmaps from './components/SavedRoadmaps';
+import { useAuth } from './contexts/AuthContext';
 
 // --- Theme Management ---
 type Theme = 'light' | 'dark';
@@ -58,6 +64,50 @@ const useTheme = () => {
 };
 
 // --- UI Components ---
+const UserProfile: React.FC = () => {
+  const { user, logout } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!user) return null;
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="p-2 rounded-full bg-[var(--card-background)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] border border-[var(--card-border)] transition-colors"
+        aria-label="User menu"
+      >
+        <UserIcon className="w-5 h-5" />
+      </button>
+
+      {isOpen && (
+        <>
+          <div 
+            className="fixed inset-0 z-10"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute right-0 mt-2 w-56 bg-[var(--card-background)] border border-[var(--card-border)] rounded-lg shadow-xl z-20 overflow-hidden">
+            <div className="px-4 py-3 border-b border-[var(--card-border)]">
+              <p className="text-sm font-semibold text-[var(--foreground)]">{user.name}</p>
+              <p className="text-xs text-[var(--muted-foreground)] mt-1">{user.email}</p>
+            </div>
+            <button
+              onClick={() => {
+                logout();
+                setIsOpen(false);
+              }}
+              className="w-full px-4 py-3 text-left text-sm text-[var(--foreground)] hover:bg-[var(--background)] transition-colors flex items-center gap-2"
+            >
+              <LogOutIcon className="w-4 h-4" />
+              Sign Out
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const ThemeSwitcher: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   return (
@@ -90,6 +140,8 @@ const AppContent: React.FC = () => {
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Show message if loading > 5 seconds
   const [showDelayMessage, setShowDelayMessage] = useState<boolean>(false);
@@ -104,6 +156,17 @@ const AppContent: React.FC = () => {
     }
     return () => { if (timer) clearTimeout(timer); };
   }, [isLoading]);
+
+  // -- Handle roadmap from navigation state (from SavedRoadmaps) --
+  useEffect(() => {
+    if (location.state && (location.state as any).roadmap) {
+      const savedRoadmap = (location.state as any).roadmap as Roadmap;
+      setRoadmap(savedRoadmap);
+      setSelectedRole(savedRoadmap.careerPath);
+      // Clear the state to prevent re-loading on refresh
+      navigate('/', { replace: true, state: {} });
+    }
+  }, [location.state, navigate]);
 
   // -- Handle browser back navigation --
   useEffect(() => {
@@ -154,10 +217,34 @@ const AppContent: React.FC = () => {
       <BackgroundAnimation />
       <div className="max-w-7xl mx-auto relative z-10">
         <header className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--gradient-from)] to-[var(--gradient-to)]">
-            Smart Career Pathfinder
-          </h1>
           <div className="flex items-center gap-4">
+            <div className="animate-rocket">
+              <RocketIcon className="w-10 h-10 sm:w-12 sm:h-12 text-transparent bg-clip-text" style={{
+                stroke: 'url(#gradient)',
+                fill: 'none'
+              }} />
+              <svg width="0" height="0">
+                <defs>
+                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style={{ stopColor: 'var(--gradient-from)', stopOpacity: 1 }} />
+                    <stop offset="100%" style={{ stopColor: 'var(--gradient-to)', stopOpacity: 1 }} />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[var(--gradient-from)] to-[var(--gradient-to)]">
+              Smart Career Pathfinder
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/saved')}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--card-background)] text-[var(--foreground)] hover:bg-[var(--card-border)] border border-[var(--card-border)] transition-colors"
+            >
+              <BookmarkIcon className="w-5 h-5" />
+              <span className="hidden sm:inline">My Roadmaps</span>
+            </button>
+            <UserProfile />
             <ThemeSwitcher />
           </div>
         </header>
@@ -195,9 +282,44 @@ const AppContent: React.FC = () => {
   );
 };
 
+// Protected Route Component
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  return user ? <>{children}</> : <Navigate to="/login" />;
+};
+
 const App: React.FC = () => (
   <ThemeProvider>
-    <AppContent />
+    <PixelBlast />
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route
+        path="/saved"
+        element={
+          <ProtectedRoute>
+            <SavedRoadmaps />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <AppContent />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   </ThemeProvider>
 );
 

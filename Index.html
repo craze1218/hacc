@@ -28,16 +28,16 @@
         }
 
         html.dark {
-            --background: #0f172a; /* slate-900 */
+            --background: #000000; /* pure black */
             --foreground: #f1f5f9; /* slate-100 */
-            --card-background: #1e293b; /* slate-800 */
+            --card-background: #0a0a0a; /* very dark gray */
             --card-foreground: #e2e8f0; /* slate-200 */
             --muted-foreground: #94a3b8; /* slate-400 */
-            --card-border: #334155; /* slate-700 */
+            --card-border: #1a1a1a; /* dark gray border */
             --primary: #22d3ee; /* cyan-400 */
             --primary-hover: #06b6d4; /* cyan-500 */
-            --button-secondary-background: #475569;
-            --button-secondary-hover: #64748b;
+            --button-secondary-background: #1a1a1a;
+            --button-secondary-hover: #2a2a2a;
             --gradient-from: #22d3ee; /* cyan-400 */
             --gradient-to: #3b82f6; /* blue-500 */
         }
@@ -60,6 +60,59 @@
         }
         .animation-delay-2000 { animation-delay: 2s; }
         .animation-delay-4000 { animation-delay: 4s; }
+
+        /* Rocket Animation */
+        @keyframes rocket {
+            0%, 100% { 
+                transform: translateY(0) rotate(-45deg); 
+            }
+            25% { 
+                transform: translateY(-8px) rotate(-40deg); 
+            }
+            50% { 
+                transform: translateY(-4px) rotate(-45deg); 
+            }
+            75% { 
+                transform: translateY(-8px) rotate(-50deg); 
+            }
+        }
+        .animate-rocket {
+            animation: rocket 3s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        /* Particle Pulse Animation */
+        @keyframes particlePulse {
+            0%, 100% { 
+                opacity: 0.3;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% { 
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: var(--background);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-hover);
+        }
+        /* Firefox scrollbar */
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) var(--background);
+        }
 
 
         /* Prism Light Theme Overrides */

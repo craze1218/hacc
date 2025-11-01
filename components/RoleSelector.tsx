@@ -12,6 +12,11 @@ import {
   PythonIcon,
   CareerIcon,
   ExternalLinkIcon,
+  MonitorIcon,
+  ServerIcon,
+  BarChartIcon,
+  BrainIcon,
+  LayersIcon,
 } from './icons';
 
 interface RoleSelectorProps {
@@ -124,6 +129,15 @@ const CourseItem: React.FC<{ course: Course; isExpanded: boolean; onClick: () =>
   );
 };
 
+// Role configuration with icons
+const roleConfig = [
+  { name: 'Frontend Developer', icon: MonitorIcon, color: 'from-blue-500 to-cyan-500' },
+  { name: 'Backend Developer', icon: ServerIcon, color: 'from-green-500 to-emerald-500' },
+  { name: 'Full Stack Developer', icon: LayersIcon, color: 'from-orange-500 to-amber-500' },
+  { name: 'Data Scientist', icon: BarChartIcon, color: 'from-purple-500 to-pink-500' },
+  { name: 'AI Engineer', icon: BrainIcon, color: 'from-indigo-500 to-violet-500' },
+];
+
 // ----------- Main RoleSelector Component -----------
 const RoleSelector: React.FC<RoleSelectorProps> = ({ onSelectRole, onBack, roadmap }) => {
   const [expandedCourseIndex, setExpandedCourseIndex] = useState<number | null>(null);
@@ -181,19 +195,33 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({ onSelectRole, onBack, roadm
           )}
         </>
       ) : (
-        <div className="mt-6 flex justify-center gap-4 flex-wrap">
-          {['Frontend Developer', 'Backend Developer', 'Data Scientist', 'Product Manager', 'AI Engineer'].map((role) => (
-            <button
-              key={role}
-              onClick={() => {
-                onSelectRole(role);
-                window.history.pushState({}, '', '#roadmap');
-              }}
-              className="px-4 py-2 rounded bg-[var(--primary)] text-white hover:bg-[var(--card-border)] transition m-2"
-            >
-              {role}
-            </button>
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+          {roleConfig.map((role) => {
+            const IconComponent = role.icon;
+            return (
+              <button
+                key={role.name}
+                onClick={() => {
+                  onSelectRole(role.name);
+                  window.history.pushState({}, '', '#roadmap');
+                }}
+                className="group relative overflow-hidden bg-[var(--card-background)] border border-[var(--card-border)] rounded-xl p-6 hover:shadow-2xl hover:scale-105 transition-all duration-300 text-left"
+              >
+                <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${role.color}`}></div>
+                <div className="flex flex-col items-center text-center space-y-4">
+                  <div className={`p-4 rounded-full bg-gradient-to-br ${role.color} bg-opacity-10 group-hover:scale-110 transition-transform duration-300`}>
+                    <IconComponent className="w-10 h-10 text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg text-[var(--foreground)] group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[var(--gradient-from)] group-hover:to-[var(--gradient-to)] transition-all duration-300">
+                    {role.name}
+                  </h3>
+                  <p className="text-sm text-[var(--muted-foreground)]">
+                    Click to explore career path
+                  </p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

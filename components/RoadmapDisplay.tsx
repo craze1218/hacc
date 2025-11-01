@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Roadmap, Phase, Course, Skill } from '../types';
+import { Roadmap, Phase, Course, Skill, SavedRoadmap } from '../types';
+import { useAuth } from '../contexts/AuthContext';
+import Toast from './Toast';
 import {
     ArrowLeftIcon,
     ChevronDownIcon,
@@ -174,6 +176,51 @@ const CourseItem: React.FC<{ course: Course; isExpanded: boolean; onClick: () =>
 
 const RoadmapDisplay: React.FC<RoadmapDisplayProps> = ({ roadmap, onBack }) => {
   const [expandedCourseIndex, setExpandedCourseIndex] = useState<number | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const { user } = useAuth();
+
+  // Check if roadmap is already saved
+  useEffect(() => {
+    if (user) {
+      const savedRoadmaps = JSON.parse(localStorage.getItem('savedRoadmaps') || '[]') as SavedRoadmap[];
+      const alreadySaved = savedRoadmaps.some(
+        (saved) => saved.userId === user.id && saved.roadmap.careerPath === roadmap.careerPath
+      );
+      setIsSaved(alreadySaved);
+    }
+  }, [user, roadmap.careerPath]);
+
+  const handleSaveRoadmap = () => {
+    if (!user) {
+      setToast({ message: 'Please login to save roadmaps', type: 'error' });
+      return;
+    }
+
+    const savedRoadmaps = JSON.parse(localStorage.getItem('savedRoadmaps') || '[]') as SavedRoadmap[];
+    
+    // Check if already saved
+    const alreadySaved = savedRoadmaps.some(
+      (saved) => saved.userId === user.id && saved.roadmap.careerPath === roadmap.careerPath
+    );
+
+    if (alreadySaved) {
+      setToast({ message: 'Roadmap already saved!', type: 'info' });
+      return;
+    }
+
+    const newSavedRoadmap: SavedRoadmap = {
+      id: Date.now().toString(),
+      userId: user.id,
+      roadmap,
+      savedAt: new Date().toISOString(),
+    };
+
+    savedRoadmaps.push(newSavedRoadmap);
+    localStorage.setItem('savedRoadmaps', JSON.stringify(savedRoadmaps));
+    setIsSaved(true);
+    setToast({ message: 'Roadmap saved successfully! 🎉', type: 'success' });
+  };
 
   useEffect(() => {
     // Run Prism highlighting after the component has rendered with the new roadmap data.
@@ -194,13 +241,35 @@ const RoadmapDisplay: React.FC<RoadmapDisplayProps> = ({ roadmap, onBack }) => {
 
   return (
     <div className="fade-in">
-        <button
-            onClick={onBack}
-            className="flex items-center gap-2 mb-8 text-[var(--muted-foreground)] hover:text-[var(--primary)] transition-colors"
-        >
-            <ArrowLeftIcon className="w-5 h-5" />
-            <span>Choose a different path</span>
-        </button>
+        {toast && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
+
+        <div className="flex justify-between items-center mb-8">
+            <button
+                onClick={onBack}
+                className="flex items-center gap-2 text-[var(--muted-foreground)] hover:text-[var(--primary)] transition-colors"
+            >
+                <ArrowLeftIcon className="w-5 h-5" />
+                <span>Choose a different path</span>
+            </button>
+
+            <button
+                onClick={handleSaveRoadmap}
+                disabled={isSaved}
+                className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+                    isSaved
+                        ? 'bg-green-500/20 text-green-600 dark:text-green-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-[var(--gradient-from)] to-[var(--gradient-to)] text-white hover:opacity-90'
+                }`}
+            >
+                {isSaved ? '✓ Saved' : '💾 Save Roadmap'}
+            </button>
+        </div>
 
         <div className="text-center mb-12">
             <h2 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[var(--gradient-from)] to-[var(--gradient-to)] mb-2">{roadmap.careerPath}</h2>
@@ -217,16 +286,56 @@ const RoadmapDisplay: React.FC<RoadmapDisplayProps> = ({ roadmap, onBack }) => {
         {roadmap.courses && roadmap.courses.length > 0 && (
           <div className="mt-16 max-w-4xl mx-auto">
               <h3 className="text-3xl font-bold text-center text-[var(--foreground)] mb-8">Recommended Courses</h3>
-              <div className="space-y-3">
-                  {roadmap.courses.map((course, index) => (
-                      <CourseItem 
-                          key={index} 
-                          course={course}
-                          isExpanded={expandedCourseIndex === index}
-                          onClick={() => handleToggleCourse(index)}
-                      />
-                  ))}
-              </div>
+              
+              {/* Free Courses Section */}
+              {roadmap.courses.filter(course => course.isFree).length > 0 && (
+                <div className="mb-12">
+                  <div className="flex items-center gap-3 mb-4">
+                    <h4 className="text-2xl font-bold text-[var(--foreground)]">Free Courses</h4>
+                    <span className="px-3 py-1 text-sm font-semibold bg-green-500/20 text-green-600 dark:text-green-400 rounded-full">
+                      Free
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                      {roadmap.courses
+                        .map((course, originalIndex) => ({ course, originalIndex }))
+                        .filter(({ course }) => course.isFree)
+                        .map(({ course, originalIndex }) => (
+                          <CourseItem 
+                              key={originalIndex} 
+                              course={course}
+                              isExpanded={expandedCourseIndex === originalIndex}
+                              onClick={() => handleToggleCourse(originalIndex)}
+                          />
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Paid Courses Section */}
+              {roadmap.courses.filter(course => !course.isFree).length > 0 && (
+                <div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <h4 className="text-2xl font-bold text-[var(--foreground)]">Paid Courses</h4>
+                    <span className="px-3 py-1 text-sm font-semibold bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full">
+                      Premium
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                      {roadmap.courses
+                        .map((course, originalIndex) => ({ course, originalIndex }))
+                        .filter(({ course }) => !course.isFree)
+                        .map(({ course, originalIndex }) => (
+                          <CourseItem 
+                              key={originalIndex} 
+                              course={course}
+                              isExpanded={expandedCourseIndex === originalIndex}
+                              onClick={() => handleToggleCourse(originalIndex)}
+                          />
+                      ))}
+                  </div>
+                </div>
+              )}
           </div>
         )}
 
